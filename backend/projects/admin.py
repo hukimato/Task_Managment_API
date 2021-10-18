@@ -10,11 +10,11 @@ class TaskTypeAdmin(admin.ModelAdmin):
 
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'weight', 'task_type', 'creation_date', 'dead_line', 'is_done')
+    list_display = ('id', 'title', 'content', 'weight', 'taskType', 'creation_date', 'dead_line', 'is_done')
     list_display_links = ('id', 'title')
     search_fields = ('id', 'title',)
     list_editable = ('is_done',)
-    list_filter = ('task_type', 'is_done')
+    list_filter = ('taskType', 'is_done')
 
 
 class PositionAdmin(admin.ModelAdmin):
