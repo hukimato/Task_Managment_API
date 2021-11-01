@@ -11,7 +11,7 @@ class UserProfileAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            "fields": (("email",),)
+            "fields": (("email", "username", "password"),)
         }),
         (None, {
             "fields": (("last_name", "first_name"),)

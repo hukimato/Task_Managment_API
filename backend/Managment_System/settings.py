@@ -82,13 +82,25 @@ WSGI_APPLICATION = 'Managment_System.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# for local host
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'db_new',
+#         'USER': 'hukimato',
+#         'PASSWORD': 'al4802046',
+#         'HOST': '127.0.0.1',
+#         'PORT': '3307'
+#     }
+# }
+# for docker using
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'db_new',
+        'NAME': 'mysql',
         'USER': 'root',
-        'PASSWORD': 'al4802046',
-        'HOST': '127.0.0.1',
+        'PASSWORD': 'root',
+        'HOST': 'db',
         'PORT': '3306'
     }
 }

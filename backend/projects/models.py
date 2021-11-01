@@ -32,12 +32,15 @@ class Task(models.Model):
     title = models.CharField(max_length=100, verbose_name='Название')
     content = models.TextField(verbose_name='Описание задания', default=None)
     weight = models.IntegerField(verbose_name='Сложность')
-    taskType = models.ForeignKey('TaskType', default=None, on_delete=models.PROTECT, blank=True, verbose_name='Тип задания')
+    taskType = models.ForeignKey('TaskType', default=None, on_delete=models.PROTECT, blank=True,
+                                 verbose_name='Тип задания')
     creation_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     dead_line = models.DateTimeField(blank=True, verbose_name='Срок сдачи')
     is_done = models.BooleanField(default=False)
-    project = models.ForeignKey('Project',default=None, on_delete=models.CASCADE, blank=False, verbose_name='Проект',
+    project = models.ForeignKey('Project', default=None, on_delete=models.CASCADE, blank=False, verbose_name='Проект',
                                 related_name='tasks')
+    doers = models.ManyToManyField('Employee', default=None, blank=True, verbose_name='Исполнители',
+                                   related_name='Исполнители')
 
     def __str__(self):
         return self.title
@@ -46,6 +49,9 @@ class Task(models.Model):
         verbose_name = 'Задача'
         verbose_name_plural = 'Задачи'
         ordering = ['project', '-creation_date']
+
+    def get_doers(self):
+        return "\n".join([str(t.user) for t in self.doers.all()])
 
 
 class Position(models.Model):
@@ -72,7 +78,7 @@ class Employee(models.Model):  # Employee сильно связанный с п�
                                 related_name='employees')
 
     def __str__(self):
-        return str(self.user)
+        return str(self.user.first_name + ' ' + self.user.last_name)
 
     class Meta:
         verbose_name = 'Сотрудник'

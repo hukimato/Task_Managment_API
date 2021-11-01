@@ -14,7 +14,6 @@ class ManagerSerializer(serializers.ModelSerializer):
         )
 
 
-
 class TaskTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.TaskType
