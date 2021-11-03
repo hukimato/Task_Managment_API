@@ -1,15 +1,9 @@
 FROM python:3.9.7
+ENV PYTHONUNBUFFERED=1
+WORKDIR /code
+COPY req.txt /code/
+RUN pip install -r req.txt
+COPY . /code/
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
-WORKDIR /usr/src/opana_rest
-
-COPY ./req.txt /usr/src/req.txt
-RUN pip install -r /usr/src/req.txt
-
-COPY . /usr/src/opana_rest
-
-EXPOSE 8000
+CMD ["python", "manage.py", "makemigrations"]
 CMD ["python", "manage.py", "migrate"]
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

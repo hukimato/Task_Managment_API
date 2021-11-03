@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-l8)z_=8eijqw_052+2!gz^%+on8uxkt9=8*(pxhwmii2jn7p)2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["0.0.0.0"]
 
 
 # Application definition
@@ -96,12 +96,12 @@ WSGI_APPLICATION = 'Managment_System.wsgi.application'
 # for docker using
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mysql',
-        'USER': 'root',
-        'PASSWORD': 'root',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
         'HOST': 'db',
-        'PORT': '3306'
+        'PORT': 5432,
     }
 }
 
@@ -159,11 +159,11 @@ AUTHENTICATION_BACKENDS = (
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-        ),
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        )
+    )
 }
 
 
