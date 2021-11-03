@@ -279,28 +279,50 @@ class SetEmployeeOnTask(APIView):
 
     def patch(self, request, pk, pos_pk):
         task = models.Task.objects.get(project=pk, id=pos_pk)
-
-        serializer = serializers.TaskSerializer(task,data=request.data, partial=True)
-        if request.data.get('doers_ids'):
-            doers_ids_str = request.data.get('doers_ids')
-            doers_ids = [int(s) for s in doers_ids_str.split(',')]
-            self.check_object_permissions(request, models.Project.objects.get(id=pk),
-                                          models.Employee.objects.filter(id__in=doers_ids))
-            if serializer.is_valid():
-                serializer.save(project=models.Project.objects.get(id=pk),
-                                doers=models.Employee.objects.filter(id__in=doers_ids)
-                                )
-                return Response(status=201)
-            # return Response(doers_ids)
-            else:
-                return Response(status=400)
+        self.check_object_permissions(request, models.Project.objects.get(id=pk),
+                                      models.Employee.objects.get(id=request.data.get('doer_id', None)))
+        task.doers.add(models.Employee.objects.get(id=request.data.get('doer_id', None)))
+        serializer = serializers.TaskSerializer(task, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save(project=models.Project.objects.get(id=pk))
+            return Response(status=201)
+        # return Response(doers_ids)
         else:
-            if serializer.is_valid():
-                serializer.save(project=models.Project.objects.get(id=pk))
-                return Response(status=201)
-            # return Response(doers_ids)
-            else:
-                return Response(status=400)
+            return Response(status=400)
+
+    def delete(self, request, pk, pos_pk):
+        task = models.Task.objects.get(project=pk, id=pos_pk)
+        self.check_object_permissions(request, models.Project.objects.get(id=pk),
+                                      models.Employee.objects.get(id=request.data.get('doer_id', None)))
+        task.doers.remove(models.Employee.objects.get(id=request.data.get('doer_id', None)))
+        serializer = serializers.TaskSerializer(task, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save(project=models.Project.objects.get(id=pk))
+            return Response(status=201)
+        # return Response(doers_ids)
+        else:
+            return Response(status=400)
+
+        # if request.data.get('doers_ids'):
+        #     doers_ids_str = request.data.get('doers_ids')
+        #     doers_ids = [int(s) for s in doers_ids_str.split(',')]
+        #     self.check_object_permissions(request, models.Project.objects.get(id=pk),
+        #                                   models.Employee.objects.filter(id__in=doers_ids))
+        #     if serializer.is_valid():
+        #         serializer.save(project=models.Project.objects.get(id=pk),
+        #                         doers=models.Employee.objects.filter(id__in=doers_ids)
+        #                         )
+        #         return Response(status=201)
+        #     # return Response(doers_ids)
+        #     else:
+        #         return Response(status=400)
+        # else:
+        #     if serializer.is_valid():
+        #         serializer.save(project=models.Project.objects.get(id=pk))
+        #         return Response(status=201)
+        #     # return Response(doers_ids)
+        #     else:
+        #         return Response(status=400)
 
 
 
