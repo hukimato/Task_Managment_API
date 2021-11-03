@@ -14,4 +14,5 @@ urlpatterns = [
     path("projects/<int:pk>/employee/<int:pos_pk>/", views.EmployeeView.as_view()),  # Проверено
     path("projects/<int:pk>/task/<int:pos_pk>/", views.TaskView.as_view()),  # Проверено
     path("projects/<int:pk>/task/", views.TaskListView.as_view()),
+    path("projects/<int:pk>/employee_set/<int:pos_pk>/", views.SetEmployeeOnTask.as_view()),
 ]
