@@ -2,6 +2,8 @@ from rest_framework import serializers
 from . import models
 from django.contrib.auth import get_user_model
 
+User = get_user_model()
+
 
 class ManagerSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,11 +36,14 @@ class TaskFileSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = models.Task
         fields = "__all__"
 
     def create(self, validated_data):
+        doers = validated_data.get('doers')
+
         task = models.Task.objects.create(
             title=validated_data.get('title', None),
             content=validated_data.get('content', None),
@@ -47,9 +52,17 @@ class TaskSerializer(serializers.ModelSerializer):
             dead_line=validated_data.get('dead_line', None),
             is_done=validated_data.get('is_done', None),
             project=validated_data.get('project', None),
-            doers=validated_data.get('doers', None)
+            #doers=validated_data.get('doers', None)
         )
+        task.doers.set(validated_data.get('doers', None))
+         #
+         # if doers:
+         #     for doer in doers:
+         #         task.doers.add(doer)
+
         return task
+
+
 
 
 class PositionSerializer(serializers.ModelSerializer):
@@ -71,13 +84,13 @@ class EmployeeSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        position = models.Position.objects.create(
-            user=models.User.objects.get(validated_data.get('user_id', None)),
+        employee = models.Employee.objects.create(
+            user=validated_data.get('user', None),
             chief=validated_data.get('chief', None),
             position=validated_data.get('position', None),
             project=validated_data.get('project', None)
         )
-        return position
+        return employee
 
 
 class ProjectSerializer(serializers.ModelSerializer):

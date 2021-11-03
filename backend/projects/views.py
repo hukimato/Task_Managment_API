@@ -8,12 +8,12 @@ from . import serializers
 
 class ProjectListView(APIView):
 
-    def get(self, request):
+    def get(self, request):  # Работает
         projects = models.Project.objects.filter(manager=self.request.user)
         serializer = serializers.ProjectSerializer(projects, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
+    def post(self, request):  # Работает
         serializer = serializers.ProjectSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(manager=self.request.user)
@@ -21,7 +21,7 @@ class ProjectListView(APIView):
         else:
             return Response(status=400)
 
-    def delete(self, request):
+    def delete(self, request):  # Работает
         project = models.Project.objects.get(id=request.data.get("id"))
         project.delete()
         return Response(status=200)
@@ -183,11 +183,17 @@ class TaskListView(APIView):
 
     def post(self, request, pk):
         serializer = serializers.TaskSerializer(data=request.data)
+        doers_ids_str = request.data.get('doers_ids')
+        doers_ids = [int(s) for s in doers_ids_str.split(',')]
         if serializer.is_valid():
-            serializer.save(project=models.Project.objects.get(id=pk))
+            serializer.save(project=models.Project.objects.get(id=pk),
+                            doers=models.Employee.objects.filter(id__in=doers_ids)
+                            )
             return Response(status=201)
+            #return Response(doers_ids)
         else:
             return Response(status=400)
+
 
 class TaskView(APIView):
 
@@ -199,9 +205,14 @@ class TaskView(APIView):
     def patch(self, request, pk, pos_pk):
         task = models.Task.objects.get(project=pk, id=pos_pk)
         serializer = serializers.TaskSerializer(task, data=request.data, partial=True)
+        doers_ids_str = request.data.get('doers_ids')
+        doers_ids = [int(s) for s in doers_ids_str.split(',')]
         if serializer.is_valid():
-            serializer.save(project=models.Project.objects.get(id=pk))
+            serializer.save(project=models.Project.objects.get(id=pk),
+                            doers=models.Employee.objects.filter(id__in=doers_ids)
+                            )
             return Response(status=201)
+            # return Response(doers_ids)
         else:
             return Response(status=400)
 
