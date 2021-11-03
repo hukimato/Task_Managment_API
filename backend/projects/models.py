@@ -81,6 +81,7 @@ class Employee(models.Model):  # Employee сильно связанный с п�
         return str(self.user.first_name + ' ' + self.user.last_name)
 
     class Meta:
+        unique_together = ('user', 'project',)
         verbose_name = 'Сотрудник'
         verbose_name_plural = 'Сотрудники'
         ordering = ['project', 'id']

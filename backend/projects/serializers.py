@@ -19,6 +19,13 @@ class TaskTypeSerializer(serializers.ModelSerializer):
         model = models.TaskType
         fields = "__all__"
 
+    def create(self, validated_data):
+        task_type = models.TaskType.objects.create(
+            title=validated_data.get('title', None),
+            project=validated_data.get('project', None)
+        )
+        return task_type
+
 
 class TaskFileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,11 +38,31 @@ class TaskSerializer(serializers.ModelSerializer):
         model = models.Task
         fields = "__all__"
 
+    def create(self, validated_data):
+        task = models.Task.objects.create(
+            title=validated_data.get('title', None),
+            content=validated_data.get('content', None),
+            weight=validated_data.get('weight', None),
+            taskType=validated_data.get('taskType', None),
+            dead_line=validated_data.get('dead_line', None),
+            is_done=validated_data.get('is_done', None),
+            project=validated_data.get('project', None),
+            doers=validated_data.get('doers', None)
+        )
+        return task
+
 
 class PositionSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Position
         fields = "__all__"
+
+    def create(self, validated_data):
+        position = models.Position.objects.create(
+            title=validated_data.get('title', None),
+            project=validated_data.get('project', None)
+        )
+        return position
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
@@ -43,15 +70,37 @@ class EmployeeSerializer(serializers.ModelSerializer):
         model = models.Employee
         fields = "__all__"
 
+    def create(self, validated_data):
+        position = models.Position.objects.create(
+            user=models.User.objects.get(validated_data.get('user_id', None)),
+            chief=validated_data.get('chief', None),
+            position=validated_data.get('position', None),
+            project=validated_data.get('project', None)
+        )
+        return position
 
-class ProjectListSerializer(serializers.ModelSerializer):
-    manager = ManagerSerializer()
+
+class ProjectSerializer(serializers.ModelSerializer):
+    manager = ManagerSerializer(read_only=True)
 
     class Meta:
         model = models.Project
-        fields = "__all__"
+        fields = (
+            "id",
+            "project_name",
+            "manager"
+        )
+
+    def create(self, validated_data):
+        project = models.Project.objects.create(
+            manager=validated_data.get('manager', None),
+            project_name=validated_data.get('project_name', None)
+        )
+        return project
 
 
+
+'''
 class ProjectSerializer(serializers.ModelSerializer):
     manager = ManagerSerializer()
     employees = EmployeeSerializer(many=True)
@@ -70,5 +119,5 @@ class ProjectSerializer(serializers.ModelSerializer):
             "tasks",
             "positions"
         )
-
+'''
 
