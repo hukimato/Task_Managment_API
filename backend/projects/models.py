@@ -10,6 +10,7 @@ class TaskType(models.Model):
         return self.title
 
     class Meta:
+        unique_together = ('title', 'project',)
         verbose_name = 'Тип задачи'
         verbose_name_plural = 'Типы задач'
         ordering = ['title']
@@ -46,6 +47,7 @@ class Task(models.Model):
         return self.title
 
     class Meta:
+        unique_together = ('title', 'project',)
         verbose_name = 'Задача'
         verbose_name_plural = 'Задачи'
         ordering = ['project', '-creation_date']
@@ -63,6 +65,7 @@ class Position(models.Model):
         return self.title
 
     class Meta:
+        unique_together = ('title', 'project',)
         verbose_name = 'Роль'
         verbose_name_plural = 'Роли'
         ordering = ['project', 'title']
