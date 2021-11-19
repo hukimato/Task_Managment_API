@@ -15,11 +15,11 @@
     docker-compose run opana_web python manage.py migrate     
     docker-compose run opana_web python manage.py createsuperuser   
 
-## Подключение к базе данных:   
-**port**: 33066  
-**user**: root  
-**password**: root   
-**Database**: mysql   
+## Подключение к базе данных:   (не актуально)
+**port**:  
+**user**:   
+**password**:     
+**Database**:      
 
 ## Подключение к серверу  
-<http://127.0.0.1:8000/>
+<http://127.0.0.1:8000/> 
