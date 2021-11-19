@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from . import models
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 
 User = get_user_model()
 
@@ -24,6 +25,7 @@ class TaskTypeSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         task_type = models.TaskType.objects.create(
             title=validated_data.get('title', None),
+            color=validated_data.get('color', None),
             project=validated_data.get('project', None)
         )
         return task_type
@@ -63,8 +65,6 @@ class TaskSerializer(serializers.ModelSerializer):
         return task
 
 
-
-
 class PositionSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Position
@@ -73,6 +73,7 @@ class PositionSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         position = models.Position.objects.create(
             title=validated_data.get('title', None),
+            color=validated_data.get('color', None),
             project=validated_data.get('project', None)
         )
         return position

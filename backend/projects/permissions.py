@@ -39,6 +39,9 @@ class IsChiefOfEmployee(BasePermission):
         return False
 
     def has_object_permission(self, request, view, obj1, obj2):  # obj1 - проект, obj2 - работники
+
+        if obj1.manager == request.user:
+            return True
         if models.Employee.objects.filter(user=request.user, project=obj1).exists():
             chief = obj2.chief
             while chief:
@@ -46,8 +49,6 @@ class IsChiefOfEmployee(BasePermission):
                     return True
                 chief = chief.chief
                 return False
-        elif obj1.manager == request.user:
-            return True
         return False
 
 

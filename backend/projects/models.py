@@ -3,7 +3,8 @@ from django.db import models
 
 class TaskType(models.Model):
     title = models.CharField(max_length=100, verbose_name='Наименование')
-    project = models.ForeignKey('Project',default=None, on_delete=models.CASCADE, blank=False, verbose_name='Проект',
+    color = models.CharField(max_length=7, verbose_name='Цвет', default='#000000')
+    project = models.ForeignKey('Project', default=None, on_delete=models.CASCADE, blank=False, verbose_name='Проект',
                                 related_name='task_types')
 
     def __str__(self):
@@ -58,6 +59,7 @@ class Task(models.Model):
 
 class Position(models.Model):
     title = models.CharField(max_length=100, verbose_name='Наименование')
+    color = models.CharField(max_length=7, verbose_name='Цвет', default='#000000')
     project = models.ForeignKey('Project', default=None, on_delete=models.CASCADE, blank=False, verbose_name='Проект',
                                 related_name='positions')
 

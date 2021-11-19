@@ -3,20 +3,25 @@ from rest_framework.views import APIView
 from django.db import models as django_models
 from rest_framework.permissions import IsAuthenticated
 from django.db import IntegrityError
-
+from rest_framework import status
 from . import models
 from . import serializers
 from .permissions import IsManagerOfProject, IsParticipantOfProject, IsChiefOfEmployee
+from django.contrib.auth.models import AnonymousUser
 
 
 class ProjectListView(APIView):
 
     def get(self, request):  # Работает
+        if self.request.user.is_anonymous:
+            return Response({'detail': 'Unauthorized'}, status=401)
         projects = models.Project.objects.filter(manager=self.request.user)
         serializer = serializers.ProjectSerializer(projects, many=True)
         return Response(serializer.data)
 
     def post(self, request):  # Работает
+        if self.request.user.is_anonymous:
+            return Response({'detail': 'Unauthorized'}, status=401)
         serializer = serializers.ProjectSerializer(data=request.data)
         if serializer.is_valid():
             try:
@@ -36,6 +41,8 @@ class ProjectListView(APIView):
 class ProjectParticipantListView(APIView):  # Работает
 
     def get(self, request):
+        if self.request.user.is_anonymous:
+            return Response({'detail': 'Unauthorized'}, status=401)
         projects = [employee.project for employee in models.Employee.objects.filter(user=self.request.user)]
         serializer = serializers.ProjectSerializer(projects, many=True)
         return Response(serializer.data)
@@ -48,7 +55,7 @@ class ProjectView(APIView):
         project = models.Project.objects.get(id=pk)
         self.check_object_permissions(request, project)
         serializer = serializers.ProjectSerializer(project)
-        return Response(serializer.data)
+        return Response(serializer.data, status=200)
 
     def patch(self, request, pk):
         project = models.Project.objects.get(id=pk)
@@ -110,7 +117,7 @@ class PositionView(APIView):
                 serializer.save(project=models.Project.objects.get(id=pk))
             except IntegrityError:
                 return Response({'error': 'IntegrityError'}, status=400)
-            return Response(status=201)
+            return Response(serializer.data, status=201)
         else:
             return Response({'error': 'InvalidSerializer'},status=400)
 
@@ -138,7 +145,7 @@ class TaskTypeListView(APIView):
                 serializer.save(project=models.Project.objects.get(id=pk))
             except IntegrityError:
                 return Response({'error': 'IntegrityError'}, status=400)
-            return Response(status=201)
+            return Response(serializer.data, status=201)
         else:
             return Response({'error': 'InvalidSerializer'},status=400)
 
@@ -161,7 +168,7 @@ class TaskTypeView(APIView):
                 serializer.save(project=models.Project.objects.get(id=pk))
             except IntegrityError:
                 return Response({'error': 'IntegrityError'}, status=400)
-            return Response(status=201)
+            return Response(serializer.data, status=201)
         else:
             return Response({'error': 'InvalidSerializer'},status=400)
 
@@ -223,6 +230,7 @@ class EmployeeView(APIView):
 
     def delete(self, request, pk, pos_pk):
         employee = models.Employee.objects.get(project=pk, id=pos_pk)
+        self.check_object_permissions(request, models.Project.objects.get(id=pk))
         employee.delete()
         return Response(status=200)
 
@@ -242,7 +250,9 @@ class TaskListView(APIView):
         serializer = serializers.TaskSerializer(data=request.data)
         self.check_object_permissions(request, models.Project.objects.get(id=pk))
         doers_ids_str = request.data.get('doers_ids')
-        doers_ids = [int(s) for s in doers_ids_str.split(',')]
+        doers_ids = [0]
+        if doers_ids_str:
+            doers_ids = [int(s) for s in doers_ids_str.split(',')]
         if serializer.is_valid():
             try:
                 serializer.save(project=models.Project.objects.get(id=pk),
@@ -321,9 +331,9 @@ class SetEmployeeOnTask(APIView):
 
     def patch(self, request, pk, pos_pk):
         if not request.data.get('doer_id', None):
-            return Response({'error': 'Invalid data'}, status=400)
+            return Response({'error': 'Invalid doers'}, status=400)
         if models.Employee.objects.get(id=request.data.get('doer_id', None)).project != models.Project.objects.get(id=pk):
-            return Response({'error': 'Invalid data'}, status=400)
+            return Response({'error': 'Invalid employee'}, status=400)
         task = models.Task.objects.get(project=pk, id=pos_pk)
         self.check_object_permissions(request, models.Project.objects.get(id=pk),
                                       models.Employee.objects.get(id=request.data.get('doer_id', None)))
@@ -351,7 +361,7 @@ class SetEmployeeOnTask(APIView):
         serializer = serializers.TaskSerializer(task, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save(project=models.Project.objects.get(id=pk))
-            return Response(serializer.data, status=201)
+            return Response(serializer.data, status=200)
         # return Response(doers_ids)
         else:
             return Response({'error': 'InvalidSerializer'}, status=400)
